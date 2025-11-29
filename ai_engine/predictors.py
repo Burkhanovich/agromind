@@ -77,7 +77,7 @@ class IrrigationPredictor:
                 'error': str(e),
                 'need_irrigation': False,
                 'confidence_score': 0,
-                'recommendation': 'AI tahlil xatosi - qo\'lda tekshiring'
+                "recommendation": "AI tahlil xatosi - qo'lda tekshiring"
             }
     
     def _calculate_irrigation_score(self, soil_moisture: float, air_humidity: float, 
@@ -531,7 +531,7 @@ class GeminiIntegration:
             
             plant_info = f"""
         O'SIMLIK MAXSUS MA'LUMOTLARI:
-        - O'simlik turi: {plant_params.get('plant_type', 'N/A')} - {plant_type_info.get(plant_params.get('plant_type', ''), 'Noma\'lum tur')}
+        - O'simlik turi: {plant_params.get('plant_type', 'N/A')} - {plant_type_info.get(plant_params.get('plant_type', ''), "Noma'lum tur")}
         - O'simlik yoshi: {plant_params.get('plant_age', 'N/A')} kun
         - O'sish bosqichi: {plant_params.get('growth_stage', 'N/A')} - {growth_stage_info.get(plant_params.get('growth_stage', ''), '')}
         - O'simliklar soni: {plant_params.get('plant_count', 'N/A')} dona
@@ -619,7 +619,7 @@ class GeminiIntegration:
         - Barcha javoblarni ANIQ RAQAMLAR bilan bering
         - Har bir tavsiyaga ILMIY ASOS ko'rsating
         - PRAKTIK va amalga oshirilishi MUMKIN bo'lgan takliflar bering
-        - {plant_params.get('plant_type', 'o\'simlik') if plant_params else 'o\'simlik'} ning biologik ehtiyojlarini hisobga oling
+        - {plant_params.get('plant_type', "o'simlik") if plant_params else 'osimlik'} ning biologik ehtiyojlarini hisobga oling
         - Ob-havo o'zgarishlariga moslashish strategiyasini ham qo'shing
 
         Javobingizni professional, aniq va amaliy yo'nalishdagi format bilan bering.
@@ -804,9 +804,9 @@ class GeminiIntegration:
         • pH darajasi: {ph} (Optimal: 6.0-7.2)
         
         🌤️ OB-HAVO OMILLARI:
-        • Shamol tezligi: {wind_speed} km/h - {'Yuqori bug\'lanish' if wind_speed > 15 else 'Normal bug\'lanish'}
+        • Shamol tezligi: {wind_speed} km/h - {'Yuqori buglanish' if wind_speed > 15 else 'Normal buglanish'}
         • UV indeksi: {uv_index} - {'Yuqori nurlanish' if uv_index > 7 else 'Normal nurlanish'}  
-        • Havo sifati: {air_quality}/5 - {'Yaxshi' if air_quality <= 2 else 'O\'rtacha' if air_quality <= 3 else 'Yomon'}
+        • Havo sifati: {air_quality}/5 - {'Yaxshi' if air_quality <= 2 else 'Ortacha' if air_quality <= 3 else 'Yomon'}
         
         🎯 TAVSIYA SABABLARI:
         {self._generate_detailed_reasoning(soil_moisture, temperature, air_humidity, ph, wind_speed)}
@@ -837,7 +837,7 @@ class GeminiIntegration:
 🌱 O'SIMLIK SIGI'LI:
 • Umumiy holat: {health_score}% 
 • Status: {self._get_health_status(health_score)}
-• Stress darajasi: {'YUQORI' if soil_moisture < 30 else 'O\'RTACHA' if soil_moisture < 50 else 'PAST'}
+• Stress darajasi: {'YUQORI' if soil_moisture < 30 else 'ORTACHA' if soil_moisture < 50 else 'PAST'}
 
 ⚠️ XAVF OMILLARI:
 {self._generate_detailed_reasoning(soil_moisture, temperature, air_humidity, ph, wind_speed)}
