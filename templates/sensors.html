@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Sug'orish - Sensor Ma'lumotlari</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(15px);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #00ff87, #60efff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 0;
+        }
+
+        .nav-links a {
+            display: block;
+            color: #fff;
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            background: linear-gradient(45deg, #00ff87, #60efff);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 135, 0.3);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .panel h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #00ff87;
+        }
+
+        .sensors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .sensor-card {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 20px;
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .sensor-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .sensor-card.critical {
+            border-left: 4px solid #ff416c;
+            background: rgba(255, 65, 108, 0.15);
+        }
+
+        .sensor-card.warning {
+            border-left: 4px solid #ff9a00;
+            background: rgba(255, 154, 0, 0.15);
+        }
+
+        .sensor-card.normal {
+            border-left: 4px solid #00ff87;
+            background: rgba(0, 255, 135, 0.15);
+        }
+
+        .sensor-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .sensor-icon {
+            font-size: 2rem;
+        }
+
+        .sensor-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .sensor-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .sensor-status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .status-critical {
+            background: rgba(255, 65, 108, 0.3);
+            color: #ff416c;
+        }
+
+        .status-warning {
+            background: rgba(255, 154, 0, 0.3);
+            color: #ff9a00;
+        }
+
+        .status-normal {
+            background: rgba(0, 255, 135, 0.3);
+            color: #00ff87;
+        }
+
+        .sensor-details {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            line-height: 1.4;
+        }
+
+        .sensor-timestamp {
+            font-size: 0.8rem;
+            opacity: 0.6;
+            margin-top: 10px;
+        }
+
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            max-width: 400px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            z-index: 10000;
+            animation: slideInRight 0.5s ease, slideOutRight 0.5s ease 3.5s forwards;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .notification.error {
+            background: linear-gradient(45deg, #ff416c, #ff4b2b);
+            border: 2px solid #ff416c;
+        }
+
+        .notification.warning {
+            background: linear-gradient(45deg, #ff9a00, #ffcd00);
+            border: 2px solid #ff9a00;
+        }
+
+        .notification.success {
+            background: linear-gradient(45deg, #00ff87, #60efff);
+            border: 2px solid #00ff87;
+        }
+
+        .notification.info {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: 2px solid #667eea;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOutRight {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(400px); opacity: 0; }
+        }
+
+        .controls-panel {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .refresh-btn {
+            background: linear-gradient(45deg, #00ff87, #60efff);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 135, 0.3);
+        }
+
+        .last-update {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span>🤖</span>
+                AI Sug'orish Tizimi
+            </div>
+            <ul class="nav-links">
+                <li><a href="/">🏠 Dashboard</a></li>
+                <li><a href="/weather.html">🌤️ Ob-havo</a></li>
+                <li><a href="/sensors.html" class="active">📡 Datchilar</a></li>
+                <li><a href="/ai.html">🧠 AI Tahlil</a></li>
+                <li><a href="/settings.html">⚙️ Sozlamalar</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Controls Panel -->
+        <div class="panel">
+            <div class="controls-panel">
+                <button class="refresh-btn" onclick="loadSensorData()">🔄 Yangilash</button>
+                <div class="last-update">
+                    Oxirgi yangilanish: <span id="lastUpdate">-</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sensors Grid -->
+        <div class="panel">
+            <h2>📡 Real-time Sensor Ma'lumotlari</h2>
+            <div id="sensorsGrid" class="sensors-grid">
+                <!-- Sensor cards will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Sensor Statistics -->
+        <div class="panel">
+            <h2>📊 Sensor Statistikasi</h2>
+            <div class="sensors-grid">
+                <div class="sensor-card normal">
+                    <div class="sensor-header">
+                        <div class="sensor-icon">✅</div>
+                        <div class="sensor-name">Faol Datchiklar</div>
+                    </div>
+                    <div id="activeSensors" class="sensor-value">-</div>
+                    <div class="sensor-details">Hozirda ishlayotgan datchiklar soni</div>
+                </div>
+
+                <div class="sensor-card warning">
+                    <div class="sensor-header">
+                        <div class="sensor-icon">⚠️</div>
+                        <div class="sensor-name">Ogohlantirish</div>
+                    </div>
+                    <div id="warningSensors" class="sensor-value">-</div>
+                    <div class="sensor-details">Diqqat talab qiladigan datchiklar</div>
+                </div>
+
+                <div class="sensor-card critical">
+                    <div class="sensor-header">
+                        <div class="sensor-icon">🚨</div>
+                        <div class="sensor-name">Kritik</div>
+                    </div>
+                    <div id="criticalSensors" class="sensor-value">-</div>
+                    <div class="sensor-details">Darhol harakat talab qiladigan</div>
+                </div>
+
+                <div class="sensor-card normal">
+                    <div class="sensor-header">
+                        <div class="sensor-icon">📊</div>
+                        <div class="sensor-name">Jami</div>
+                    </div>
+                    <div id="totalSensors" class="sensor-value">-</div>
+                    <div class="sensor-details">Tizimdagi barcha datchiklar</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sensors page initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📡 Sensors page initialized');
+            loadSensorData();
+            
+            // Auto refresh every 10 seconds
+            setInterval(loadSensorData, 10000);
+        });
+
+        // Notification function
+        function showNotification(message, type = 'info') {
+            document.querySelectorAll('.notification').forEach(n => n.remove());
+            
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            
+            let icon = '';
+            switch(type) {
+                case 'error': icon = '❌ '; break;
+                case 'warning': icon = '⚠️ '; break;
+                case 'success': icon = '✅ '; break;
+                case 'info': icon = 'ℹ️ '; break;
+            }
+            
+            notification.innerHTML = `${icon}${message}`;
+            notification.addEventListener('click', () => notification.remove());
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 4000);
+        }
+
+        // Load sensor data
+        async function loadSensorData() {
+            try {
+                document.body.classList.add('loading');
+                showNotification('Sensor ma\'lumotlari yuklanmoqda...', 'info');
+                
+                const response = await fetch('/api/realtime/');
+                const data = await response.json();
+                
+                if (!data.success || data.error) {
+                    showEmptySensorData();
+                    showNotification('Sensor API xatolik: ' + (data.message || 'Ma\'lumot yo\'q'), 'error');
+                    return;
+                }
+                
+                updateSensorsDisplay(data.sensors || []);
+                updateLastUpdateTime();
+                showNotification('Sensor ma\'lumotlari yangilandi ✓', 'success');
+                
+            } catch (error) {
+                console.error('Sensors data error:', error);
+                showEmptySensorData();
+                showNotification('Sensor ma\'lumotlarini yuklashda xatolik', 'error');
+            } finally {
+                document.body.classList.remove('loading');
+            }
+        }
+
+        // Update sensors display
+        function updateSensorsDisplay(sensors) {
+            const grid = document.getElementById('sensorsGrid');
+            
+            if (!sensors || sensors.length === 0) {
+                grid.innerHTML = '<div class="sensor-card"><div class="sensor-name">Ma\'lumot yo\'q</div><div class="sensor-details">Sensor ma\'lumotlari topilmadi</div></div>';
+                return;
+            }
+            
+            grid.innerHTML = '';
+            
+            let stats = { active: 0, warning: 0, critical: 0, total: sensors.length };
+            
+            sensors.forEach(sensor => {
+                const card = document.createElement('div');
+                
+                // Determine status
+                let status = 'normal';
+                let statusText = 'Normal';
+                let statusClass = 'status-normal';
+                
+                if (sensor.sensor_type && sensor.sensor_type.toLowerCase().includes('moisture')) {
+                    if (sensor.value < 25) {
+                        status = 'critical';
+                        statusText = 'Kritik';
+                        statusClass = 'status-critical';
+                        stats.critical++;
+                    } else if (sensor.value < 40) {
+                        status = 'warning';
+                        statusText = 'Ogohlantirish';
+                        statusClass = 'status-warning';
+                        stats.warning++;
+                    } else {
+                        stats.active++;
+                    }
+                } else {
+                    stats.active++;
+                }
+                
+                card.className = `sensor-card ${status}`;
+                card.innerHTML = `
+                    <div class="sensor-header">
+                        <div class="sensor-icon">${getSensorIcon(sensor.sensor_type || '')}</div>
+                        <div class="sensor-name">${sensor.sensor_name || 'Noma\'lum sensor'}</div>
+                    </div>
+                    <div class="sensor-value">${sensor.value || '-'}${sensor.unit || ''}</div>
+                    <div class="sensor-status ${statusClass}">${statusText}</div>
+                    <div class="sensor-details">
+                        📍 ${sensor.location || 'Noma\'lum joylashuv'}<br>
+                        🆔 ${sensor.sensor_id || 'ID yo\'q'}
+                    </div>
+                    <div class="sensor-timestamp">
+                        🕒 ${formatTime(sensor.timestamp)}
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            });
+            
+            // Update statistics
+            updateSensorStats(stats);
+        }
+
+        // Update sensor statistics
+        function updateSensorStats(stats) {
+            document.getElementById('activeSensors').textContent = stats.active;
+            document.getElementById('warningSensors').textContent = stats.warning;
+            document.getElementById('criticalSensors').textContent = stats.critical;
+            document.getElementById('totalSensors').textContent = stats.total;
+        }
+
+        // Show empty sensor data
+        function showEmptySensorData() {
+            const grid = document.getElementById('sensorsGrid');
+            grid.innerHTML = `
+                <div class="sensor-card">
+                    <div class="sensor-header">
+                        <div class="sensor-icon">❌</div>
+                        <div class="sensor-name">API Xatolik</div>
+                    </div>
+                    <div class="sensor-value">-</div>
+                    <div class="sensor-details">Sensor ma'lumotlari yuklanmadi</div>
+                </div>
+            `;
+            
+            // Reset stats
+            updateSensorStats({ active: 0, warning: 0, critical: 0, total: 0 });
+        }
+
+        // Get sensor icon
+        function getSensorIcon(sensorType) {
+            const type = sensorType.toLowerCase();
+            if (type.includes('moisture') || type.includes('namlik')) return '🌍';
+            if (type.includes('temperature') || type.includes('harorat')) return '🌡️';
+            if (type.includes('humidity') || type.includes('havo')) return '💧';
+            if (type.includes('ph')) return '⚗️';
+            if (type.includes('conductivity') || type.includes('otkazuvchan')) return '⚡';
+            if (type.includes('light') || type.includes('yorug')) return '☀️';
+            return '📡';
+        }
+
+        // Format timestamp
+        function formatTime(timestamp) {
+            if (!timestamp) return 'Noma\'lum vaqt';
+            
+            try {
+                const date = new Date(timestamp);
+                return date.toLocaleTimeString('uz-UZ', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+            } catch {
+                return 'Noma\'lum vaqt';
+            }
+        }
+
+        // Update last update time
+        function updateLastUpdateTime() {
+            const now = new Date();
+            document.getElementById('lastUpdate').textContent = now.toLocaleTimeString('uz-UZ', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        }
+    </script>
+</body>
+</html>

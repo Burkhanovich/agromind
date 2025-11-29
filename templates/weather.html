@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Sug'orish - Ob-havo Tahlili</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(15px);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #00ff87, #60efff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 0;
+        }
+
+        .nav-links a {
+            display: block;
+            color: #fff;
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            background: linear-gradient(45deg, #00ff87, #60efff);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 135, 0.3);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .panel h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #00ff87;
+        }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+
+        .weather-card {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .weather-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .weather-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .weather-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .weather-label {
+            opacity: 0.8;
+            font-size: 1rem;
+        }
+
+        .weather-detail {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin-top: 10px;
+        }
+
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            max-width: 400px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            z-index: 10000;
+            animation: slideInRight 0.5s ease, slideOutRight 0.5s ease 3.5s forwards;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .notification.error {
+            background: linear-gradient(45deg, #ff416c, #ff4b2b);
+            border: 2px solid #ff416c;
+        }
+
+        .notification.warning {
+            background: linear-gradient(45deg, #ff9a00, #ffcd00);
+            border: 2px solid #ff9a00;
+        }
+
+        .notification.success {
+            background: linear-gradient(45deg, #00ff87, #60efff);
+            border: 2px solid #00ff87;
+        }
+
+        .notification.info {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: 2px solid #667eea;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOutRight {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(400px); opacity: 0; }
+        }
+
+        .forecast-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .forecast-day {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .forecast-temps {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .temp-high {
+            color: #ff9a00;
+            font-weight: bold;
+        }
+
+        .temp-low {
+            color: #60efff;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span>🤖</span>
+                AI Sug'orish Tizimi
+            </div>
+            <ul class="nav-links">
+                <li><a href="/">🏠 Dashboard</a></li>
+                <li><a href="/weather.html" class="active">🌤️ Ob-havo</a></li>
+                <li><a href="/sensors.html">📡 Datchilar</a></li>
+                <li><a href="/ai.html">🧠 AI Tahlil</a></li>
+                <li><a href="/settings.html">⚙️ Sozlamalar</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Current Weather Panel -->
+        <div class="panel">
+            <h2>🌤️ Joriy Ob-havo Holati</h2>
+            <div class="grid-4">
+                <div class="weather-card">
+                    <div class="weather-icon">🌡️</div>
+                    <div id="currentTemp" class="weather-value">-</div>
+                    <div class="weather-label">Harorat</div>
+                    <div id="feelsLike" class="weather-detail">His qilingani: -</div>
+                </div>
+
+                <div class="weather-card">
+                    <div class="weather-icon">💧</div>
+                    <div id="currentHumidity" class="weather-value">-</div>
+                    <div class="weather-label">Namlik</div>
+                    <div id="dewPoint" class="weather-detail">Shudring nuqtasi: -</div>
+                </div>
+
+                <div class="weather-card">
+                    <div class="weather-icon">💨</div>
+                    <div id="windSpeed" class="weather-value">-</div>
+                    <div class="weather-label">Shamol</div>
+                    <div id="windDirection" class="weather-detail">Yo'nalish: -</div>
+                </div>
+
+                <div class="weather-card">
+                    <div class="weather-icon">☁️</div>
+                    <div id="pressure" class="weather-value">-</div>
+                    <div class="weather-label">Bosim</div>
+                    <div id="visibility" class="weather-detail">Ko'rinish: -</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Extended Weather Info -->
+        <div class="grid-2">
+            <div class="panel">
+                <h2>🌞 Qo'shimcha Ma'lumotlar</h2>
+                <div class="grid-2">
+                    <div class="weather-card">
+                        <div class="weather-icon">☀️</div>
+                        <div id="uvIndex" class="weather-value">-</div>
+                        <div class="weather-label">UV Indeksi</div>
+                        <div id="solarRadiation" class="weather-detail">Quyosh radiatsiyasi: - W/m²</div>
+                    </div>
+
+                    <div class="weather-card">
+                        <div class="weather-icon">🌧️</div>
+                        <div id="rainfall" class="weather-value">-</div>
+                        <div class="weather-label">Yomg'ir</div>
+                        <div id="cloudCoverage" class="weather-detail">Bulutlilik: -%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>🌬️ Havo Sifati</h2>
+                <div class="weather-card">
+                    <div class="weather-icon">🏭</div>
+                    <div id="airQuality" class="weather-value">-</div>
+                    <div class="weather-label">AQI</div>
+                    <div id="airQualityText" class="weather-detail">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weather Forecast -->
+        <div class="panel">
+            <h2>📅 5 Kunlik Prognoz</h2>
+            <div id="forecastContainer" class="grid-3">
+                <!-- Forecast cards will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Weather page initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🌤️ Weather page initialized');
+            loadWeatherData();
+            
+            // Auto refresh every 10 minutes
+            setInterval(loadWeatherData, 600000);
+        });
+
+        // Notification function
+        function showNotification(message, type = 'info') {
+            document.querySelectorAll('.notification').forEach(n => n.remove());
+            
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            
+            let icon = '';
+            switch(type) {
+                case 'error': icon = '❌ '; break;
+                case 'warning': icon = '⚠️ '; break;
+                case 'success': icon = '✅ '; break;
+                case 'info': icon = 'ℹ️ '; break;
+            }
+            
+            notification.innerHTML = `${icon}${message}`;
+            notification.addEventListener('click', () => notification.remove());
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 4000);
+        }
+
+        // Load weather data
+        async function loadWeatherData() {
+            try {
+                showNotification('Ob-havo ma\'lumotlari yuklanmoqda...', 'info');
+                
+                // Current weather
+                const weatherResponse = await fetch('/api/sensor/weather/');
+                const weatherData = await weatherResponse.json();
+                
+                if (weatherData.error) {
+                    showEmptyWeatherData();
+                    showNotification('Ob-havo API xatolik: ' + weatherData.message, 'error');
+                    return;
+                }
+                
+                updateWeatherDisplay(weatherData);
+                showNotification('Ob-havo ma\'lumotlari yangilandi ✓', 'success');
+                
+                // Weather forecast
+                loadWeatherForecast();
+                
+            } catch (error) {
+                console.error('Weather data error:', error);
+                showEmptyWeatherData();
+                showNotification('Ob-havo ma\'lumotlarini yuklashda xatolik', 'error');
+            }
+        }
+
+        // Update weather display
+        function updateWeatherDisplay(weather) {
+            // Main weather data
+            document.getElementById('currentTemp').textContent = weather.temperature !== '-' ? 
+                `${Math.round(weather.temperature)}°C` : '-';
+            document.getElementById('feelsLike').textContent = weather.feels_like_temperature !== '-' ? 
+                `His qilingani: ${Math.round(weather.feels_like_temperature)}°C` : 'His qilingani: -';
+            
+            document.getElementById('currentHumidity').textContent = weather.humidity !== '-' ? 
+                `${Math.round(weather.humidity)}%` : '-';
+            document.getElementById('dewPoint').textContent = weather.dew_point !== '-' ? 
+                `Shudring nuqtasi: ${weather.dew_point}°C` : 'Shudring nuqtasi: -';
+            
+            document.getElementById('windSpeed').textContent = weather.wind_speed !== '-' ? 
+                `${Math.round(weather.wind_speed)} km/h` : '-';
+            document.getElementById('windDirection').textContent = weather.wind_direction !== '-' ? 
+                `Yo'nalish: ${weather.wind_direction}` : 'Yo\'nalish: -';
+            
+            document.getElementById('pressure').textContent = weather.pressure !== '-' ? 
+                `${Math.round(weather.pressure)} hPa` : '-';
+            document.getElementById('visibility').textContent = weather.visibility !== '-' ? 
+                `Ko'rinish: ${Math.round(weather.visibility/1000)} km` : 'Ko\'rinish: -';
+            
+            // Extended data
+            document.getElementById('uvIndex').textContent = weather.uv_index !== '-' ? 
+                weather.uv_index : '-';
+            document.getElementById('solarRadiation').textContent = weather.solar_radiation !== '-' ? 
+                `Quyosh: ${Math.round(weather.solar_radiation)} W/m²` : 'Quyosh: -';
+            
+            document.getElementById('rainfall').textContent = weather.rainfall !== '-' ? 
+                `${weather.rainfall} mm` : '-';
+            document.getElementById('cloudCoverage').textContent = weather.cloud_coverage !== '-' ? 
+                `Bulutlilik: ${weather.cloud_coverage}%` : 'Bulutlilik: -';
+            
+            // Air quality
+            document.getElementById('airQuality').textContent = weather.air_quality_index !== '-' ? 
+                weather.air_quality_index : '-';
+            
+            let aqiText = '-';
+            if (weather.air_quality_index !== '-') {
+                const aqi = weather.air_quality_index;
+                if (aqi <= 2) aqiText = 'Yaxshi';
+                else if (aqi <= 3) aqiText = 'O\'rtacha';
+                else aqiText = 'Yomon';
+            }
+            document.getElementById('airQualityText').textContent = aqiText;
+        }
+
+        // Show empty weather data
+        function showEmptyWeatherData() {
+            const elements = [
+                'currentTemp', 'feelsLike', 'currentHumidity', 'dewPoint',
+                'windSpeed', 'windDirection', 'pressure', 'visibility',
+                'uvIndex', 'solarRadiation', 'rainfall', 'cloudCoverage',
+                'airQuality', 'airQualityText'
+            ];
+            
+            elements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = '-';
+                }
+            });
+        }
+
+        // Load weather forecast
+        async function loadWeatherForecast() {
+            try {
+                const forecastResponse = await fetch('/api/sensor/weather-forecast/');
+                const forecastData = await forecastResponse.json();
+                
+                if (forecastData.error || !forecastData.success) {
+                    document.getElementById('forecastContainer').innerHTML = 
+                        '<div class="forecast-card"><div class="forecast-day">Prognoz ma\'lumoti yo\'q</div><div>API ishlamayapti</div></div>';
+                    return;
+                }
+                
+                updateForecastDisplay(forecastData.forecasts || []);
+                
+            } catch (error) {
+                console.error('Forecast error:', error);
+                document.getElementById('forecastContainer').innerHTML = 
+                    '<div class="forecast-card"><div class="forecast-day">Xatolik</div><div>Prognozni yuklab bo\'lmadi</div></div>';
+            }
+        }
+
+        // Update forecast display
+        function updateForecastDisplay(forecasts) {
+            const container = document.getElementById('forecastContainer');
+            
+            if (!forecasts || forecasts.length === 0) {
+                container.innerHTML = '<div class="forecast-card"><div class="forecast-day">Ma\'lumot yo\'q</div></div>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            forecasts.slice(0, 5).forEach(forecast => {
+                const forecastCard = document.createElement('div');
+                forecastCard.className = 'forecast-card';
+                
+                const date = new Date(forecast.forecast_date);
+                const dayName = date.toLocaleDateString('uz-UZ', { weekday: 'short' });
+                
+                forecastCard.innerHTML = `
+                    <div class="forecast-day">${dayName}</div>
+                    <div class="weather-icon">${getWeatherIcon(forecast.weather_condition)}</div>
+                    <div class="forecast-temps">
+                        <span class="temp-high">${Math.round(forecast.temp_max)}°</span>
+                        <span class="temp-low">${Math.round(forecast.temp_min)}°</span>
+                    </div>
+                    <div class="weather-detail">${forecast.weather_condition}</div>
+                    <div class="weather-detail">💧 ${Math.round(forecast.humidity)}%</div>
+                `;
+                
+                container.appendChild(forecastCard);
+            });
+        }
+
+        // Get weather icon
+        function getWeatherIcon(condition) {
+            if (!condition) return '❓';
+            
+            const cond = condition.toLowerCase();
+            if (cond.includes('clear')) return '☀️';
+            if (cond.includes('cloud')) return '☁️';
+            if (cond.includes('rain')) return '🌧️';
+            if (cond.includes('snow')) return '❄️';
+            if (cond.includes('storm')) return '⛈️';
+            return '🌤️';
+        }
+    </script>
+</body>
+</html>
