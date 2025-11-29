@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from django.utils import timezone
 from datetime import timedelta
 import uuid
-import logging
+import loggicng
 
 from .models import AIModel, AIPrediction, AIAnalysisSession, AIInsight
 from .predictors import irrigation_predictor, plant_health_analyzer, gemini_integration
