@@ -424,7 +424,7 @@ def train_model(request):
         ai_model.save()
         
         return Response({
-            'message': f'{ai_model.name} muvaffaqiyatli qayta o\'qitildi',
+            'message': f"{ai_model.name} muvaffaqiyatli qayta o\'qitildi",
             'new_accuracy': round(ai_model.accuracy, 1),
             'training_data_count': ai_model.training_data_count,
             'improvement': round(improvement, 1)

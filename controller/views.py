@@ -19,12 +19,12 @@ def start_irrigation(request):
         
         if zone_id == 'all':
             zones = IrrigationZone.objects.filter(status='active')
-            message = f'Barcha zonalarda sug\'orish boshlandi ({duration_minutes} daqiqa)'
+            message = f"Barcha zonalarda sug\'orish boshlandi ({duration_minutes} daqiqa)"
         else:
             try:
                 zone = IrrigationZone.objects.get(zone_id=zone_id, status='active')
                 zones = [zone]
-                message = f'Zona {zone_id}da sug\'orish boshlandi ({duration_minutes} daqiqa)'
+                message = f"Zona {zone_id}da sug\'orish boshlandi ({duration_minutes} daqiqa)"
             except IrrigationZone.DoesNotExist:
                 return Response({
                     'error': f'Zona {zone_id} topilmadi yoki faol emas'
@@ -93,7 +93,7 @@ def stop_irrigation(request):
             events_stopped += 1
         
         return Response({
-            'message': f'Sug\'orish to\'xtatildi. {events_stopped} ta faol jarayon yakunlandi.',
+            'message': f"Sug\'orish to\'xtatildi. {events_stopped} ta faol jarayon yakunlandi.",
             'events_stopped': events_stopped,
             'status': 'irrigation_stopped'
         }, status=status.HTTP_200_OK)
