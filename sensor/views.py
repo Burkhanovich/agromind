@@ -218,7 +218,7 @@ def get_weather_data(request):
                 'wind_gust': '-',
                 'solar_radiation': '-',
                 'error': f'OpenWeather API error: {current_response.status_code}',
-                'message': 'Havo ma\'lumotlarini yuklashda API xatoligi'
+                'message': "Havo ma'lumotlarini yuklashda API xatoligi"
             }, status=status.HTTP_400_BAD_REQUEST)
             
         current_data = current_response.json()
@@ -296,7 +296,7 @@ def get_weather_data(request):
             'wind_gust': '-',
             'solar_radiation': '-',
             'error': f'NETWORK_ERROR: {str(e)}',
-            'message': 'Havo ma\'lumotlarini yuklashda xatolik yuz berdi'
+            'message': "Havo ma'lumotlarini yuklashda xatolik yuz berdi"
         }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
     except Exception as e:
         # API ishlamagan holda chiziqcha qaytarish
@@ -319,7 +319,7 @@ def get_weather_data(request):
             'wind_gust': '-',
             'solar_radiation': '-',
             'error': f'WEATHER_API_ERROR: {str(e)}',
-            'message': 'Havo ma\'lumotlarini yuklashda xatolik yuz berdi'
+            'message': "Havo ma'lumotlarini yuklashda xatolik yuz berdi"
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
